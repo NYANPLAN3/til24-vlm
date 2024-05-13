@@ -1,0 +1,33 @@
+// Format details: https://aka.ms/devcontainer.json
+// Custom Dockerfile: https://containers.dev/guide/dockerfile
+{
+  "name": "py-api-template",
+
+  // https://github.com/devcontainers/templates/tree/main/src/ubuntu
+  "image": "mcr.microsoft.com/devcontainers/base:jammy",
+
+  // https://containers.dev/features
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "installTools": true,
+      "toolsToInstall": "poetry",
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "charliermarsh.ruff",
+        "njpwerner.autodocstring",
+        "tamasfe.even-better-toml"
+      ]
+    }
+  },
+
+  "hostRequirements": { "gpu": "optional" },
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": ".devcontainer/hooks/postCreate.sh"
+}

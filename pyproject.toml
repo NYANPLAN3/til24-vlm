@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "py-api-template"
+version = "0.1.0"
+description = "template for python api server"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "<3.13,>=3.8"
+rich = "^13.7.1"
+fastapi = { extras = ["all"], version = "^0.111.0" }
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "*"
+poethepoet = "*"
+
+[tool.poe.tasks]
+dev = "python dev.py"
+prod = "fastapi run py_api_template --proxy-headers --port 3000"
+
+[tool.ruff.lint]
+select = ["D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
