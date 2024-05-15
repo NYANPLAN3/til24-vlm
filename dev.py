@@ -19,9 +19,9 @@ def create_debug_app():
             )
         ],
     )
-    logging.getLogger("py_api_template").setLevel(logging.DEBUG)
+    logging.getLogger("til24_vlm").setLevel(logging.DEBUG)
 
-    from py_api_template import app
+    from til24_vlm import app
 
     return app
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "dev:create_debug_app",
         host="localhost",
-        port=8000,
+        port=5004,
         log_level=logging.INFO,
         reload=True,
         factory=True,

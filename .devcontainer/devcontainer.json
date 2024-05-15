@@ -1,7 +1,7 @@
 // Format details: https://aka.ms/devcontainer.json
 // Custom Dockerfile: https://containers.dev/guide/dockerfile
 {
-  "name": "py-api-template",
+  "name": "til24-vlm",
 
   // https://github.com/devcontainers/templates/tree/main/src/ubuntu
   "image": "mcr.microsoft.com/devcontainers/base:jammy",
@@ -27,6 +27,20 @@
   },
 
   "hostRequirements": { "gpu": "optional" },
+
+  // Mount package caches.
+  "mounts": [
+    {
+      "type": "volume",
+      "source": "pypoetry-cache",
+      "target": "/home/vscode/.cache/pypoetry"
+    },
+    {
+      "type": "volume",
+      "source": "apt-cache",
+      "target": "/var/cache/apt"
+    }
+  ],
 
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": ".devcontainer/hooks/postCreate.sh"

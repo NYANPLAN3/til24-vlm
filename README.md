@@ -1,4 +1,4 @@
-# py-api-template
+# til24-vlm
 
 Template for FastAPI-based API server. Features:
 
@@ -11,21 +11,19 @@ Template for FastAPI-based API server. Features:
 Oh yeah, this template should work with the fancy "Dev Containers: Clone Repository
 in Container Volume..." feature.
 
-## Usage Instructions
-
-- Replace all instances of `py-api-template` & `py_api_template`.
-  - Tip: Rename the `py_api_template` folder first for auto-refactoring.
+Note: Competition uses port 5004 for VLM server.
 
 ## Useful Commands
 
+The venv auto-activates, so these work.
+
 ```sh
-# The venv auto-activates, so these work.
-poe prod # Launch "production" server.
-poe dev # Launch debugging server, use VSCode's debug task instead by pressing F5.
-
+# Launch debugging server, use VSCode's debug task instead by pressing F5.
+poe dev
+# Run test stolen from the official competition template repo.
+poe test
 # Building docker image for deployment.
-docker build -f Dockerfile . -t example
-
-# Running FastAPI app (with GPU),
-docker run --rm --gpus all -p 3000:3000 example
+poe build {insert_version_like_0.1.0}
+# Run the docker image locally.
+poe prod
 ```

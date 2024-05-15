@@ -23,5 +23,5 @@ RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
   pip install -U pip \
   && pip install -e .
 
-EXPOSE 3000
-CMD ["fastapi", "run", "py_api_template", "--proxy-headers", "--port", "3000"]
+EXPOSE 5004
+CMD ["fastapi", "run", "til24_vlm", "--proxy-headers", "--port", "5004"]

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "py-api-template"
+name = "til24-vlm"
 version = "0.1.0"
 description = "template for python api server"
 authors = ["Your Name <you@example.com>"]
@@ -17,7 +17,11 @@ poethepoet = "*"
 
 [tool.poe.tasks]
 dev = "python dev.py"
-prod = "fastapi run py_api_template --proxy-headers --port 3000"
+prod = "docker run --rm --gpus all -p 5004:5004 nyanplan3-vlm"
+
+[tool.poe.tasks.build]
+cmd = "docker build -f Dockerfile . -t nyanplan3-vlm:latest -t nyanplan3-vlm:${tag}"
+args = [{ name = "tag", positional = true, required = true }]
 
 [tool.ruff.lint]
 select = ["D"]
