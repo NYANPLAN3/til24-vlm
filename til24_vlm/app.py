@@ -25,7 +25,7 @@ async def hello():
     """
     debug = {}
     debug["py_version"] = sys.version
-    debug["task"] = "ASR"
+    debug["task"] = "VLM"
     debug["env"] = dict(os.environ)
 
     try:
