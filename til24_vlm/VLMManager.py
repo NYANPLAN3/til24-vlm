@@ -6,7 +6,7 @@ import torch
 import torchvision
 from transformers import Owlv2ForObjectDetection, Owlv2Processor
 
-MODEL_PATH = "./models/google_owlv2-base-patch16-ensemble"
+MODEL_PATH = "./models/google_owlv2-large-patch14-ensemble"
 
 
 class VLMManager:
@@ -33,9 +33,11 @@ class VLMManager:
         out = self.model(**inp)
 
         result = self.processor.post_process_object_detection(
-            outputs=out, target_sizes=[(ih, iw)], threshold=0.1
+            outputs=out, target_sizes=[(ih, iw)], threshold=0.01
         )[0]
         boxes, scores = result["boxes"], result["scores"]
+        if len(boxes) == 0:
+            return 0, 0, 0, 0
         box = sorted(zip(boxes, scores), key=lambda x: x[1], reverse=True)[0][0]
 
         x1, y1, x2, y2 = box.tolist()
