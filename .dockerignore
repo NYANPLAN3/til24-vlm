@@ -3,3 +3,6 @@
 .venv
 .devcontainer
 .vscode
+
+models
+!models/temp

@@ -6,21 +6,38 @@ authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "<3.13,>=3.8"
-rich = "^13.7.1"
-fastapi = { extras = ["all"], version = "^0.111.0" }
+python = "<3.13,>=3.9"
 python-dotenv = "^1.0.1"
+fastapi-slim = "^0.111.0"
+uvicorn = "^0.29.0"
+uvloop = "^0.19.0"
+httptools = "^0.6.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "*"
 poethepoet = "*"
+rich = "^13.7.1"
+ipykernel = "^6.29.4"
+pandas = "^2.2.2"
+requests = "^2.31.0"
+tqdm = "^4.66.4"
 
 [tool.poe.tasks]
-dev = "python dev.py"
-prod = "docker run --rm --gpus all -p 5004:5004 nyanplan3-vlm"
+# use_exec for some tasks to avoid hangs on SIGINT.
+dev = { cmd = "python dev.py", use_exec = true }
+prod = { cmd = "docker run --rm --gpus all -p 5004:5004 nyanplan3-vlm:latest", use_exec = true }
+test = "python eval/test_vlm.py"
+publish = "docker push asia-southeast1-docker.pkg.dev/dsta-angelhack/repository-nyanplan3/nyanplan3-vlm:latest"
+requirements = "poetry export -o requirements.txt --without-hashes"
 
 [tool.poe.tasks.build]
-cmd = "docker build -f Dockerfile . -t nyanplan3-vlm:latest -t nyanplan3-vlm:${tag}"
+cmd = """docker build -f Dockerfile . \
+  -t nyanplan3-vlm:latest \
+  -t asia-southeast1-docker.pkg.dev/dsta-angelhack/repository-nyanplan3/nyanplan3-vlm:latest \
+  -t nyanplan3-vlm:${tag} \
+  -t asia-southeast1-docker.pkg.dev/dsta-angelhack/repository-nyanplan3/nyanplan3-vlm:${tag} \
+"""
+deps = ["requirements"]
 args = [{ name = "tag", positional = true, required = true }]
 
 [tool.ruff.lint]
