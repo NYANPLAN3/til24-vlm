@@ -39,4 +39,5 @@ gcloud ai models upload --region asia-southeast1 --display-name 'nyanplan3-vlm' 
 
 ## PyTorch Wheels
 
-Err, use the NLP repo to build it. But change the build script to enable cuDNN first.
+Just run `scripts/build_source.sh` inside an instance of `nvidia/cuda:12.1.1-devel-ubuntu22.04`.
+Then copy out the wheels from `/whl`.

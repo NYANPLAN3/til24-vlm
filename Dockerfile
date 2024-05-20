@@ -18,7 +18,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   libcufft-12-1 \
   libcurand-12-1 \
   libcublas-12-1 \
-  libnvjitlink-12-1
+  libnvjitlink-12-1 \
+  libnvjpeg-12-1 \
+  libjpeg-turbo8 \
+  libpng16-16
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt-get update && apt-get install -y --no-install-recommends python3-pip
@@ -38,4 +41,5 @@ RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
 COPY --link til24_vlm ./til24_vlm
 
 EXPOSE 5004
+# uvicorn --host=0.0.0.0 --port=5004 --factory til24_vlm:create_app
 CMD ["uvicorn", "--host=0.0.0.0", "--port=5004", "--factory", "til24_vlm:create_app"]
