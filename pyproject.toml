@@ -29,6 +29,8 @@ torchvision = "^0.18.0"
 matplotlib = "^3.9.0"
 ipympl = "^0.9.4"
 opencv-python-headless = "^4.9.0.80"
+ultralytics = { path = "thirdparty/ultralytics", develop = true }
+open-clip-torch = { path = "thirdparty/open_clip", develop = true }
 
 [tool.poe.tasks]
 # use_exec for some tasks to avoid hangs on SIGINT.
@@ -39,7 +41,7 @@ publish = "docker push asia-southeast1-docker.pkg.dev/dsta-angelhack/repository-
 requirements = "poetry export -o requirements.txt --without-hashes"
 
 [tool.poe.tasks.build]
-cmd = """docker build -f Dockerfile . \
+cmd = """docker build -f Dockerfile.simple . \
   -t nyanplan3-vlm:latest \
   -t asia-southeast1-docker.pkg.dev/dsta-angelhack/repository-nyanplan3/nyanplan3-vlm:latest \
   -t nyanplan3-vlm:${tag} \
