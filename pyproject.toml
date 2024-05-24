@@ -26,6 +26,9 @@ requests = "^2.31.0"
 tqdm = "^4.66.4"
 torch = "^2.3.0"
 torchvision = "^0.18.0"
+matplotlib = "^3.9.0"
+ipympl = "^0.9.4"
+opencv-python-headless = "^4.9.0.80"
 
 [tool.poe.tasks]
 # use_exec for some tasks to avoid hangs on SIGINT.
