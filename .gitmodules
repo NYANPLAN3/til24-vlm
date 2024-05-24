@@ -1,0 +1,6 @@
+[submodule "thirdparty/ultralytics"]
+	path = thirdparty/ultralytics
+	url = https://github.com/Interpause/ultralytics.git
+[submodule "thirdparty/open_clip"]
+	path = thirdparty/open_clip
+	url = https://github.com/Interpause/open_clip.git
