@@ -5,4 +5,6 @@
 .vscode
 
 models
-!models/google_owlv2-large-patch14-ensemble
+#!models/google_owlv2-large-patch14-ensemble
+!models/Interpause_ViT-H-14-quickgelu-dfn5b-til24id
+!models/yolov9c-til24ufo.pt
