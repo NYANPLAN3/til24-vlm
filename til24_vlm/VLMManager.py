@@ -1,6 +1,7 @@
 """VLM Manager."""
 
 import io
+from functools import partial
 from typing import List
 
 import numpy as np
@@ -32,27 +33,31 @@ class VLMManager:
 
     def __init__(self):
         """Init."""
-        self.yolo = YOLO(YOLO_PATH, task="detect").cuda()
         self.model, self.preprocess = open_clip.create_model_from_pretrained(
             "ViT-H-14-quickgelu",
             pretrained=CLIP_PATH,
             # pretrained="dfn5b",
+            jit=True,
             device="cuda",
             precision="fp16",
             image_resize_mode="longest",
             image_interpolation="bicubic",
         )
-        self.model.cuda().eval()
         self.tokenizer = open_clip.get_tokenizer("ViT-H-14-quickgelu")
+        self.model.cuda().eval()
+        yolo = YOLO(YOLO_PATH, task="detect")
+        self.det = partial(yolo.predict, **YOLO_OPTS)
         self.hasher = xxhash.xxh64_hexdigest
         self._cache = dict()
 
     def _calc_im(self, im: Image.Image):
         # Get bboxes using YOLO.
-        results = self.yolo.predict(im, **YOLO_OPTS)
+        results = self.det(im)
         bboxes = results[0].boxes.xyxy.tolist()
         tens = []
         for l, t, r, b in bboxes:
+            if r - l < 3 or b - t < 3:
+                continue
             crop = im.crop((l, t, r, b))
             tens.append(self.preprocess(crop))
 

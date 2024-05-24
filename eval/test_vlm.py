@@ -56,6 +56,7 @@ def main():
             entries.append((input_dir, json.loads(l)))
 
     # Don't do all
+    random.seed(42)
     entries = random.sample(entries, 100)
 
     with mp.Pool(processes=os.cpu_count()) as pool:

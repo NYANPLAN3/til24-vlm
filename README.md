@@ -41,3 +41,12 @@ gcloud ai models upload --region asia-southeast1 --display-name 'nyanplan3-vlm' 
 
 Just run `scripts/build_source.sh` inside an instance of `nvidia/cuda:12.1.1-devel-ubuntu22.04`.
 Then copy out the wheels from `/whl`.
+
+## Ehhhh
+
+nvm torchscript version for yolov9c is somehow very subtly broken & ocassionally returning 0-sized bboxes. Likewise, torch.compile has always been high risk.
+
+```sh
+# Cannot use optimize not supported on desktops.
+yolo export model=yolov9c-til24ufo.pt format=torchscript imgsz=1536 half=True batch=1
+```
