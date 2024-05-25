@@ -13,18 +13,18 @@ from PIL import Image
 from ultralytics import YOLO
 
 YOLO_PATH = "./models/yolov9c-til24ufo.pt"
-CLIP_PATH = (
-    "./models/Interpause_ViT-H-14-quickgelu-dfn5b-til24id/open_clip_pytorch_model.bin"
-)
+CLIP_PATH = "./models/v2_e16_fp16.bin"
+MODEL_ARCH = "ViT-H-14-quickgelu"
 
 YOLO_OPTS = dict(
-    conf=0.05,
+    conf=0.01,
     iou=0.0,
     imgsz=1536,
     half=True,
     device="cuda",
     verbose=False,
     save_dir=None,
+    max_det=16,
 )
 
 
@@ -34,16 +34,16 @@ class VLMManager:
     def __init__(self):
         """Init."""
         self.model, self.preprocess = open_clip.create_model_from_pretrained(
-            "ViT-H-14-quickgelu",
+            MODEL_ARCH,
             pretrained=CLIP_PATH,
             # pretrained="dfn5b",
-            jit=True,
+            # jit=True, # NOTE: eval has 1000 samples, JiT isn't worth
             device="cuda",
             precision="fp16",
             image_resize_mode="longest",
             image_interpolation="bicubic",
         )
-        self.tokenizer = open_clip.get_tokenizer("ViT-H-14-quickgelu")
+        self.tokenizer = open_clip.get_tokenizer(MODEL_ARCH)
         self.model.cuda().eval()
         yolo = YOLO(YOLO_PATH, task="detect")
         self.det = partial(yolo.predict, **YOLO_OPTS)
