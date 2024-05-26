@@ -6,5 +6,5 @@
 
 models
 #!models/google_owlv2-large-patch14-ensemble
-!models/v2_e16_fp16.bin
+!models/v1_e28_fp16.bin
 !models/yolov9c-til24ufo.pt

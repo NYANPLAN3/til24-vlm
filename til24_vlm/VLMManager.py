@@ -13,12 +13,12 @@ from PIL import Image
 from ultralytics import YOLO
 
 YOLO_PATH = "./models/yolov9c-til24ufo.pt"
-CLIP_PATH = "./models/v2_e16_fp16.bin"
+CLIP_PATH = "./models/v1_e28_fp16.bin"
 MODEL_ARCH = "ViT-H-14-quickgelu"
 
 YOLO_OPTS = dict(
-    conf=0.01,
-    iou=0.0,
+    conf=0.05,
+    iou=0.2,
     imgsz=1536,
     half=True,
     device="cuda",
