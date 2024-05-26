@@ -17,8 +17,8 @@ CLIP_PATH = "./models/v1_e28_fp16.bin"
 MODEL_ARCH = "ViT-H-14-quickgelu"
 
 YOLO_OPTS = dict(
-    conf=0.05,
-    iou=0.2,
+    conf=0.01,
+    iou=0.0,
     imgsz=1536,
     half=True,
     device="cuda",
