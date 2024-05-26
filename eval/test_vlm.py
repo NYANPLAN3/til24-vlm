@@ -57,7 +57,7 @@ def main():
 
     # Don't do all
     random.seed(42)
-    entries = random.sample(entries, 100)
+    entries = random.sample(entries, 200)
 
     with mp.Pool(processes=os.cpu_count()) as pool:
         loaded = itertools.chain.from_iterable(
@@ -87,7 +87,7 @@ def main():
 
 
 def run_batched(
-    instances: List[Dict[str, str | int]], batch_size: int = 4
+    instances: List[Dict[str, str | int]], batch_size: int = 256
 ) -> List[Dict[str, str | int]]:
     # split into batches
     results = []
