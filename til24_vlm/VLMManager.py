@@ -9,19 +9,32 @@ import open_clip
 import torch
 import torch.nn.functional as F
 import xxhash
+from open_clip.transform import PreprocessCfg, image_transform_v2
 from PIL import Image
 from ultralytics import YOLO
+
+DEVICE = "cuda"
 
 YOLO_PATH = "./models/yolov9c-til24ufo-last.pt"
 CLIP_PATH = "./models/wiseft.bin"
 MODEL_ARCH = "ViT-H-14-quickgelu"
+MODEL_ARCH_PROPS = {
+    "size": (224, 224),
+    "mode": "RGB",
+    "mean": (0.48145466, 0.4578275, 0.40821073),
+    "std": (0.26862954, 0.26130258, 0.27577711),
+    "interpolation": "bicubic",
+    "resize_mode": "longest",
+    "fill_color": 0,
+}
+INIT_JIT = False
 
 YOLO_OPTS = dict(
     conf=0.1,
     iou=0.0,
     imgsz=1536,
     half=True,
-    device="cuda",
+    device=DEVICE,
     verbose=False,
     save_dir=None,
     max_det=16,
@@ -34,22 +47,37 @@ class VLMManager:
 
     def __init__(self):
         """Init."""
+        if INIT_JIT:
+            self._init_jit()
+        else:
+            self._init_normal()
+            print(self.model.visual.preprocess_cfg)
+        yolo = YOLO(YOLO_PATH, task="detect")
+        self.det = partial(yolo.predict, **YOLO_OPTS)
+        self.hasher = xxhash.xxh64_hexdigest
+        self._cache = dict()
+
+    def _init_normal(self):
         self.model, self.preprocess = open_clip.create_model_from_pretrained(
             MODEL_ARCH,
             pretrained=CLIP_PATH,
             # pretrained="dfn5b",
-            # jit=True, # NOTE: eval has 1000 samples, JiT isn't worth
-            device="cuda",
+            device=DEVICE,
             precision="fp16",
             image_resize_mode="longest",
             image_interpolation="bicubic",
         )
         self.tokenizer = open_clip.get_tokenizer(MODEL_ARCH)
-        self.model.cuda().eval()
-        yolo = YOLO(YOLO_PATH, task="detect")
-        self.det = partial(yolo.predict, **YOLO_OPTS)
-        self.hasher = xxhash.xxh64_hexdigest
-        self._cache = dict()
+        self.model.to(DEVICE).eval()
+
+    def _init_jit(self):
+        self.model = torch.jit.load(CLIP_PATH, map_location=DEVICE)
+        self.preprocess = image_transform_v2(
+            PreprocessCfg(**MODEL_ARCH_PROPS),
+            is_train=False,
+        )
+        self.tokenizer = open_clip.get_tokenizer(MODEL_ARCH)
+        self.model.to(DEVICE).eval()
 
     def _calc_im(self, im: Image.Image):
         # Get bboxes using YOLO.
@@ -67,19 +95,19 @@ class VLMManager:
             return None
 
         # Normalize & cache crop embeddings.
-        bat = torch.stack(tens).to("cuda")
+        bat = torch.stack(tens).to(DEVICE)
         out = F.normalize(self.model.encode_image(bat))
         embs: np.ndarray = out.numpy(force=True)
         return bboxes, embs.T
 
     def _calc_txt(self, caption):
-        tens = self.tokenizer(caption).to("cuda")
+        tens = self.tokenizer(caption).to(DEVICE)
         out = F.normalize(self.model.encode_text(tens))
         emb: np.ndarray = out.numpy(force=True)
         return emb
 
     @torch.inference_mode()
-    @torch.autocast("cuda")
+    @torch.autocast(DEVICE)
     def identify(self, image: bytes, caption: str) -> List[int]:
         """Identify."""
         imhash = self.hasher(image)

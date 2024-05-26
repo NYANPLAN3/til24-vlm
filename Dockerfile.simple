@@ -27,8 +27,9 @@ RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
 RUN --mount=type=bind,source=./thirdparty,target=/thirdparty,rw \
     pip3 install --no-cache-dir /thirdparty/open_clip /thirdparty/ultralytics
 
+COPY --link models/wiseft.bin ./models/wiseft.bin
+COPY --link models/yolov9c-til24ufo-last.pt ./models/yolov9c-til24ufo-last.pt
 COPY --link til24_vlm ./til24_vlm
-COPY --link models ./models
 
 EXPOSE 5004
 ENV TORCH_CUDNN_V8_API_ENABLED=1 PYTORCH_CUDA_ALLOC_CONF=backend:cudaMallocAsync CUDA_VISIBLE_DEVICES=0

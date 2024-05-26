@@ -7,4 +7,4 @@
 models
 #!models/google_owlv2-large-patch14-ensemble
 !models/wiseft.bin
-!models/yolov9c-til24ufo.pt
+!models/yolov9c-til24ufo-last.pt
