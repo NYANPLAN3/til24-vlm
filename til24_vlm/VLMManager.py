@@ -13,7 +13,7 @@ from PIL import Image
 from ultralytics import YOLO
 
 YOLO_PATH = "./models/yolov9c-til24ufo.pt"
-CLIP_PATH = "./models/v1_e28_fp16.bin"
+CLIP_PATH = "./models/wiseft.bin"
 MODEL_ARCH = "ViT-H-14-quickgelu"
 
 YOLO_OPTS = dict(

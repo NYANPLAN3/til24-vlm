@@ -19,7 +19,6 @@ RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
     pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 
 WORKDIR /app
-COPY --link models ./models
 
 # Remember to regenerate requirements.txt!
 COPY --link requirements.txt .env ./
@@ -29,6 +28,7 @@ RUN --mount=type=bind,source=./thirdparty,target=/thirdparty,rw \
     pip3 install --no-cache-dir /thirdparty/open_clip /thirdparty/ultralytics
 
 COPY --link til24_vlm ./til24_vlm
+COPY --link models ./models
 
 EXPOSE 5004
 ENV TORCH_CUDNN_V8_API_ENABLED=1 PYTORCH_CUDA_ALLOC_CONF=backend:cudaMallocAsync CUDA_VISIBLE_DEVICES=0
