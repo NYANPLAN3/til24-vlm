@@ -12,7 +12,7 @@ import xxhash
 from PIL import Image
 from ultralytics import YOLO
 
-YOLO_PATH = "./models/yolov9c-til24ufo.pt"
+YOLO_PATH = "./models/yolov9c-til24ufo-last.pt"
 CLIP_PATH = "./models/wiseft.bin"
 MODEL_ARCH = "ViT-H-14-quickgelu"
 
@@ -25,6 +25,7 @@ YOLO_OPTS = dict(
     verbose=False,
     save_dir=None,
     max_det=16,
+    agnostic_nms=True,
 )
 
 
