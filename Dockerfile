@@ -31,15 +31,16 @@ RUN --mount=type=bind,source=./whl,target=/whl \
   pip install --no-cache-dir /whl/*
 
 WORKDIR /app
-COPY --link models ./models
 
 # Remember to regenerate requirements.txt!
-COPY --link requirements.txt ./
+COPY --link requirements.txt .env ./
 RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
   pip install -r requirements.txt
 
+COPY --link models ./models
 COPY --link til24_vlm ./til24_vlm
 
 EXPOSE 5004
+ENV TORCH_CUDNN_V8_API_ENABLED=1 PYTORCH_CUDA_ALLOC_CONF=backend:cudaMallocAsync CUDA_VISIBLE_DEVICES=0
 # uvicorn --host=0.0.0.0 --port=5004 --factory til24_vlm:create_app
 CMD ["uvicorn", "--host=0.0.0.0", "--port=5004", "--factory", "til24_vlm:create_app"]
