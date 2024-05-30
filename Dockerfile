@@ -32,6 +32,6 @@ COPY --link models/yolov9c-til24ufo-last.pt ./models/yolov9c-til24ufo-last.pt
 COPY --link til24_vlm ./til24_vlm
 
 EXPOSE 5004
-ENV TORCH_CUDNN_V8_API_ENABLED=1 PYTORCH_CUDA_ALLOC_CONF=backend:cudaMallocAsync CUDA_VISIBLE_DEVICES=0
+ENV TORCH_CUDNN_V8_API_ENABLED=1 PYTORCH_CUDA_ALLOC_CONF=backend:cudaMallocAsync CUDA_VISIBLE_DEVICES=0 YOLO_AUTOINSTALL=false YOLO_OFFLINE=true
 # uvicorn --host=0.0.0.0 --port=5004 --factory til24_vlm:create_app
 CMD ["uvicorn", "--host=0.0.0.0", "--port=5004", "--factory", "til24_vlm:create_app"]
