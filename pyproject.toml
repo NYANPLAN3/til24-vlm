@@ -38,7 +38,7 @@ open-clip-torch = { path = "thirdparty/open_clip", develop = true }
 dev = { cmd = "python dev.py", use_exec = true }
 prod = { cmd = "docker run --rm --gpus all -p 5004:5004 nyanplan3-vlm:latest", use_exec = true }
 test = "python eval/test_vlm.py"
-publish = "docker push asia-southeast1-docker.pkg.dev/dsta-angelhack/repository-nyanplan3/nyanplan3-vlm:finals"
+publish = "docker push -a asia-southeast1-docker.pkg.dev/dsta-angelhack/repository-nyanplan3/nyanplan3-vlm"
 requirements = "poetry export -o requirements.txt --without-hashes"
 
 [tool.poe.tasks.build]
