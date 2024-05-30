@@ -42,7 +42,7 @@ publish = "docker push asia-southeast1-docker.pkg.dev/dsta-angelhack/repository-
 requirements = "poetry export -o requirements.txt --without-hashes"
 
 [tool.poe.tasks.build]
-cmd = """docker build -f Dockerfile.simple . \
+cmd = """docker build -f Dockerfile . \
   -t nyanplan3-vlm:latest \
   -t asia-southeast1-docker.pkg.dev/dsta-angelhack/repository-nyanplan3/nyanplan3-vlm:latest \
   -t asia-southeast1-docker.pkg.dev/dsta-angelhack/repository-nyanplan3/nyanplan3-vlm:finals \

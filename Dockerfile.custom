@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG CUDA_VERSION=11.8.0
+ARG CUDA_VERSION=12.1.1
 
 FROM nvidia/cuda:${CUDA_VERSION}-base-ubuntu22.04 as deploy
 
@@ -9,26 +9,35 @@ ENV PYTHONUNBUFFERED=1
 ENV PIP_ROOT_USER_ACTION=ignore
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; \
-    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+  echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && apt-get install -y --no-install-recommends python3-pip
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  apt-get update && apt-get install -y --no-install-recommends \
+  cuda-nvtx-12-1 \
+  libcusparse-12-1 \
+  libcufft-12-1 \
+  libcurand-12-1 \
+  libcublas-12-1 \
+  libnvjitlink-12-1 \
+  libnvjpeg-12-1 \
+  libjpeg-turbo8 \
+  libpng16-16
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  apt-get update && apt-get install -y --no-install-recommends python3-pip
 RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
-    pip install -U pip
-RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
-    pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+  pip install -U pip
+RUN --mount=type=bind,source=./whl,target=/whl \
+  pip install --no-cache-dir /whl/*
 
 WORKDIR /app
 
 # Remember to regenerate requirements.txt!
 COPY --link requirements.txt .env ./
 RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
-    pip install -r requirements.txt
-RUN --mount=type=bind,source=./thirdparty,target=/thirdparty,rw \
-    pip3 install --no-cache-dir /thirdparty/open_clip /thirdparty/ultralytics
+  pip install -r requirements.txt
 
-COPY --link models/wiseft.bin ./models/wiseft.bin
-COPY --link models/yolov9c-til24ufo-last.pt ./models/yolov9c-til24ufo-last.pt
+COPY --link models ./models
 COPY --link til24_vlm ./til24_vlm
 
 EXPOSE 5004
