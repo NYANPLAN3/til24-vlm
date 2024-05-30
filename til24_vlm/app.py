@@ -11,10 +11,12 @@ import sys
 
 from fastapi import FastAPI, Request
 
+from .log import setup_logging
 from .VLMManager import VLMManager
 
 __all__ = ["create_app"]
 
+setup_logging()
 log = logging.getLogger(__name__)
 
 
