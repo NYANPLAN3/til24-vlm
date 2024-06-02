@@ -43,7 +43,7 @@ YOLO_OPTS = dict(
     agnostic_nms=True,
 )
 
-PAD = os.getenv("DET_PAD", 0.0)
+PAD = float(os.getenv("DET_PAD", 0.0))
 EPAD = 0.0  # What if I purposefully made the submitted bbox larger?
 
 
