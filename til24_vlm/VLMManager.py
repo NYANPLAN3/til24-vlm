@@ -2,7 +2,8 @@
 
 import io
 from functools import partial
-from typing import List
+from math import ceil, floor
+from typing import List, Tuple
 
 import numpy as np
 import open_clip
@@ -10,7 +11,7 @@ import torch
 import torch.nn.functional as F
 import xxhash
 from open_clip.transform import PreprocessCfg, image_transform_v2
-from PIL import Image
+from PIL import Image, ImageOps
 from ultralytics import YOLO
 
 DEVICE = "cuda"
@@ -40,6 +41,9 @@ YOLO_OPTS = dict(
     max_det=16,
     agnostic_nms=True,
 )
+
+PAD = 0.0
+EPAD = 0.0  # What if I purposefully made the submitted bbox larger?
 
 
 class VLMManager:
@@ -79,15 +83,37 @@ class VLMManager:
         self.tokenizer = open_clip.get_tokenizer(MODEL_ARCH)
         self.model.to(DEVICE).eval()
 
+    def _crop_bbox_pad(self, im: Image.Image, bbox: Tuple[int, int, int, int], pad=PAD):
+        """Crop bbox with pad, filling out of bound with 0."""
+        l, t, r, b = bbox
+        ih, iw = im.height, im.width
+        ch, cw = b - t, r - l
+        if ch < 3 or cw < 3:
+            return None
+
+        if pad > 0:
+            ph, pw = ch * pad, cw * pad
+            l, t = floor(l - pw), floor(t - ph)
+            r, b = ceil(r + pw), ceil(b + ph)
+            el, et = max(-l, 0), max(-t, 0)
+            er, eb = max(r - iw, 0), max(b - ih, 0)
+
+        crop = im.crop((max(l, 0), max(t, 0), min(r, iw), min(b, ih)))
+
+        if pad > 0:
+            crop = ImageOps.expand(crop, (el, et, er, eb), fill=0)
+
+        return crop
+
     def _calc_im(self, im: Image.Image):
         # Get bboxes using YOLO.
         results = self.det(im)
         bboxes = results[0].boxes.xyxy.tolist()
         tens = []
-        for l, t, r, b in bboxes:
-            if r - l < 3 or b - t < 3:
+        for bbox in bboxes:
+            crop = self._crop_bbox_pad(im, bbox)
+            if crop is None:
                 continue
-            crop = im.crop((l, t, r, b))
             tens.append(self.preprocess(crop))
 
         # NOTE: We purposefully return invalid input if not found; That way, the eval system leaks how many failed altogether.
@@ -124,4 +150,8 @@ class VLMManager:
 
         x1, y1, x2, y2 = bboxes[idx]
         l, t, w, h = x1, y1, x2 - x1, y2 - y1
+        if EPAD > 0:
+            ew, eh = w * EPAD, h * EPAD
+            l, t, r, b = x1 - ew, y1 - eh, x2 + ew, y2 + eh
+            w, h = r - l, b - t
         return l, t, w, h
