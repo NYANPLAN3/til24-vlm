@@ -1,6 +1,7 @@
 """VLM Manager."""
 
 import io
+import os
 from functools import partial
 from math import ceil, floor
 from typing import List, Tuple
@@ -31,18 +32,18 @@ MODEL_ARCH_PROPS = {
 INIT_JIT = False
 
 YOLO_OPTS = dict(
-    conf=0.1,
+    conf=float(os.getenv("DET_CONF", 0.1)),
     iou=0.0,
     imgsz=1536,
     half=True,
     device=DEVICE,
     verbose=False,
     save_dir=None,
-    max_det=16,
+    max_det=int(os.getenv("DET_MAX", 20)),
     agnostic_nms=True,
 )
 
-PAD = 0.0
+PAD = os.getenv("DET_PAD", 0.0)
 EPAD = 0.0  # What if I purposefully made the submitted bbox larger?
 
 

@@ -2,7 +2,8 @@
 
 from dotenv import load_dotenv
 
-load_dotenv()
+if True:
+    load_dotenv()
 
 import base64
 import logging
@@ -41,7 +42,8 @@ def create_app():
             import torch  # type: ignore
 
             debug["torch_version"] = torch.__version__
-            debug["cuda_device"] = str(torch.zeros([10, 10], device="cuda").device)
+            debug["cuda_device"] = str(
+                torch.zeros([10, 10], device="cuda").device)
         except ImportError:
             pass
 
