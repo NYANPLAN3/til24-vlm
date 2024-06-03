@@ -1,6 +1,7 @@
 """VLM Manager."""
 
 import io
+import logging
 import os
 from functools import partial
 from math import ceil, floor
@@ -46,6 +47,8 @@ YOLO_OPTS = dict(
 PAD = float(os.getenv("DET_PAD", 0.0))
 EPAD = 0.0  # What if I purposefully made the submitted bbox larger?
 
+log = logging.getLogger(__name__)
+
 
 class VLMManager:
     """VLM Manager."""
@@ -56,14 +59,20 @@ class VLMManager:
             self._init_jit()
         else:
             self._init_normal()
-            print(self.model.visual.preprocess_cfg)
+        log.info(f"Loading: ${YOLO_PATH}")
         yolo = YOLO(YOLO_PATH, task="detect")
+        log.info("YOLO Loaded")
         self.det = partial(yolo.predict, **YOLO_OPTS)
         self.hasher = xxhash.xxh64_hexdigest
         self._cache = dict()
 
+        log.info("Warmup...")
+        self._warmup()
+        log.info("Hot!")
+
     def _init_normal(self):
-        self.model, self.preprocess = open_clip.create_model_from_pretrained(
+        log.info(f"Loading: {CLIP_PATH}")
+        self.clip, self.preprocess = open_clip.create_model_from_pretrained(
             MODEL_ARCH,
             pretrained=CLIP_PATH,
             # pretrained="dfn5b",
@@ -72,17 +81,21 @@ class VLMManager:
             image_resize_mode="longest",
             image_interpolation="bicubic",
         )
+        # print(self.clip.visual.preprocess_cfg)
         self.tokenizer = open_clip.get_tokenizer(MODEL_ARCH)
-        self.model.to(DEVICE).eval()
+        self.clip.to(DEVICE).eval()
+        log.info("CLIP Loaded: normal")
 
     def _init_jit(self):
-        self.model = torch.jit.load(CLIP_PATH, map_location=DEVICE)
+        log.info(f"JIT Loading: {CLIP_PATH}")
+        self.clip = torch.jit.load(CLIP_PATH, map_location=DEVICE)
         self.preprocess = image_transform_v2(
             PreprocessCfg(**MODEL_ARCH_PROPS),
             is_train=False,
         )
         self.tokenizer = open_clip.get_tokenizer(MODEL_ARCH)
-        self.model.to(DEVICE).eval()
+        self.clip.to(DEVICE).eval()
+        log.info("CLIP Loaded: JIT")
 
     def _crop_bbox_pad(self, im: Image.Image, bbox: Tuple[int, int, int, int], pad=PAD):
         """Crop bbox with pad, filling out of bound with 0."""
@@ -123,15 +136,23 @@ class VLMManager:
 
         # Normalize & cache crop embeddings.
         bat = torch.stack(tens).to(DEVICE)
-        out = F.normalize(self.model.encode_image(bat))
+        out = F.normalize(self.clip.encode_image(bat))
         embs: np.ndarray = out.numpy(force=True)
         return bboxes, embs.T
 
     def _calc_txt(self, caption):
         tens = self.tokenizer(caption).to(DEVICE)
-        out = F.normalize(self.model.encode_text(tens))
+        out = F.normalize(self.clip.encode_text(tens))
         emb: np.ndarray = out.numpy(force=True)
         return emb
+
+    @torch.inference_mode()
+    @torch.autocast(DEVICE)
+    def _warmup(self):
+        self.clip(torch.zeros((16, 3, 224, 224),
+                  dtype=torch.float32, device=DEVICE))
+        self.det(torch.zeros((1, 3, 1536, 1536),
+                 dtype=torch.float32, device=DEVICE))
 
     @torch.inference_mode()
     @torch.autocast(DEVICE)

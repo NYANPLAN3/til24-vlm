@@ -11,4 +11,4 @@ def setup_logging():
         force=False,
     )
     logging.getLogger("__main__").setLevel(logging.DEBUG)
-    logging.getLogger("src").setLevel(logging.DEBUG)
+    logging.getLogger("til24_vlm").setLevel(logging.DEBUG)
