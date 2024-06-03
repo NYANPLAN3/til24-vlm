@@ -43,4 +43,4 @@ COPY --link til24_vlm ./til24_vlm
 EXPOSE 5004
 ENV TORCH_CUDNN_V8_API_ENABLED=1 PYTORCH_CUDA_ALLOC_CONF=backend:cudaMallocAsync CUDA_VISIBLE_DEVICES=0
 # uvicorn --host=0.0.0.0 --port=5004 --factory til24_vlm:create_app
-CMD ["uvicorn", "--host=0.0.0.0", "--port=5004", "--factory", "til24_vlm:create_app"]
+CMD ["uvicorn", "--log-level=warning", "--host=0.0.0.0", "--port=5004", "--factory", "til24_vlm:create_app"]

@@ -59,7 +59,7 @@ class VLMManager:
             self._init_jit()
         else:
             self._init_normal()
-        log.info(f"Loading: ${YOLO_PATH}")
+        log.info(f"Loading: {YOLO_PATH}")
         yolo = YOLO(YOLO_PATH, task="detect")
         log.info("YOLO Loaded")
         self.det = partial(yolo.predict, **YOLO_OPTS)

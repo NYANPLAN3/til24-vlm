@@ -17,6 +17,7 @@ scipy = "^1.13.0"
 pillow = "^10.3.0"
 xxhash = "^3.4.1"
 dill = "^0.3.8"
+colorlog = "^6.8.2"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "*"

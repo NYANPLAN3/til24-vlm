@@ -70,4 +70,5 @@ def create_app():
 
         return {"predictions": predictions}
 
+    log.info("VLM App Ready.")
     return app
